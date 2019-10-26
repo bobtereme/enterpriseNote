@@ -1,0 +1,77 @@
+
+-- -----------------------------------------
+
+DROP TABLE IF EXISTS _user CASCADE;
+CREATE TABLE _user(
+    given_name VARCHAR(50),
+    family_name VARCHAR(50),
+    user_name VARCHAR(50) NOT NULL PRIMARY KEY,
+    password VARCHAR(40)
+
+);
+
+-- -----------------------------------------
+
+DROP TABLE IF EXISTS _note CASCADE;
+CREATE TABLE _note(
+    note_id serial NOT NULL PRIMARY KEY,
+    note_owner VARCHAR(50),
+    title VARCHAR(100),
+    body VARCHAR(250),
+    date_created DATE
+);
+
+-- -----------------------------------------
+
+DROP TABLE IF EXISTS _note_privileges;
+CREATE TABLE _note_privileges(
+    note_privileges_id serial NOT NULL PRIMARY KEY,
+    note_id INT,
+    user_name VARCHAR(50),
+    read CHAR(1),
+    write CHAR(1)
+);
+
+-- -----------------------------------------
+
+ALTER TABLE _note ADD  
+    CONSTRAINT note_owner FOREIGN KEY (note_owner)
+        REFERENCES _user (user_name);
+
+-- -----------------------------------------
+
+ALTER TABLE _note_privileges ADD  
+    CONSTRAINT user_name FOREIGN KEY (user_name)
+        REFERENCES _user (user_name);
+
+ALTER TABLE _note_privileges ADD  
+    CONSTRAINT note_id FOREIGN KEY (note_id)
+        REFERENCES _note (note_id);
+
+-- -----------------------------------------
+
+INSERT INTO _user(given_name, family_name, user_name, password)
+VALUES
+('Floyd', 'Wats', 'floyd', 'password'),
+('Bob', 'Tereme', 'bobtereme', 'password');
+
+-- -----------------------------------------
+
+INSERT INTO _note(note_owner, title, body, date_created)
+VALUES
+('floyd' , 'note 1', 'A bunch of random words', date('now')),
+('floyd' , 'note 2', 'A bunch of random words including hip', date('now')),
+('floyd' , 'note 3', 'A note including hippo and twist', date('now')),
+('floyd' , 'note 4', 'different things here', date('now')),
+('bobtereme' , 'note 5', 'some other things', date('now')),
+('bobtereme' , 'note 6', 'here is stuff', date('now')),
+('bobtereme' , 'note 7', 'body of text', date('now')),
+('bobtereme' , 'note 8', 'body that has the word hippo', date('now'));
+
+-- -----------------------------------------
+
+INSERT INTO _note_privileges(note_id, user_name, read, write)
+VALUES
+(8, 'floyd', 't', 't'),
+(3, 'bobtereme', 't', 't');
+
