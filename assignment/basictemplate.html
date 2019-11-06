@@ -1,0 +1,17 @@
+<h1>{{.Title}}</h1>
+<p>{{.News}}</p>
+<form action="/createUser" method="POST">
+    <label for="givenName">Given Name</label>
+    <input type="text" name="given_name" id="givenName" placeholder="Please enter your given name">
+    
+    <label for="familyName">Family Name</label>
+    <input type="text" name="family_name" id="familyName" placeholder="Please enter your family name">
+    
+    <label for="userName">User Name (Must be unique) </label>
+    <input type="text" name="user_name" id="userName" placeholder="Please enter a username">
+
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" placeholder="Enter a password">
+    
+    <input type="submit"> 
+</form>

@@ -18,7 +18,8 @@ CREATE TABLE _note(
     note_owner VARCHAR(50),
     title VARCHAR(100),
     body VARCHAR(250),
-    date_created DATE
+    date_created DATE,
+    FOREIGN KEY (note_owner) REFERENCES _user(user_name)
 );
 
 -- -----------------------------------------
@@ -28,25 +29,37 @@ CREATE TABLE _note_privileges(
     note_privileges_id serial NOT NULL PRIMARY KEY,
     note_id INT,
     user_name VARCHAR(50),
-    read CHAR(1),
-    write CHAR(1)
+    read BOOL,
+    write BOOL,
+    FOREIGN KEY (note_id) REFERENCES _note(note_id),
+    FOREIGN KEY (user_name) REFERENCES _user(user_name)
 );
+--------------------------------------------
+DROP TABLE IF EXISTS _share_settings;
+CREATE TABLE _share_settings  (
+	SharedSettingsID SERIAL PRIMARY KEY,
+	OwnerName VARCHAR(50), 
+	SharedUserID INT,
+	Read bool,
+	Write bool,
+	Name VARCHAR(30),
+	FOREIGN KEY (OwnerName) REFERENCES _user(user_name)
+);
+-- -----------------------------------------
+
+--ALTER TABLE _note ADD  
+    --CONSTRAINT note_owner FOREIGN KEY (note_owner)
+       -- REFERENCES _user (user_name);
 
 -- -----------------------------------------
 
-ALTER TABLE _note ADD  
-    CONSTRAINT note_owner FOREIGN KEY (note_owner)
-        REFERENCES _user (user_name);
+--ALTER TABLE _note_privileges ADD  
+    --CONSTRAINT user_name FOREIGN KEY (user_name)
+       -- REFERENCES _user (user_name);
 
--- -----------------------------------------
-
-ALTER TABLE _note_privileges ADD  
-    CONSTRAINT user_name FOREIGN KEY (user_name)
-        REFERENCES _user (user_name);
-
-ALTER TABLE _note_privileges ADD  
-    CONSTRAINT note_id FOREIGN KEY (note_id)
-        REFERENCES _note (note_id);
+--ALTER TABLE _note_privileges ADD  
+   -- CONSTRAINT note_id FOREIGN KEY (note_id)
+       -- REFERENCES _note (note_id);
 
 -- -----------------------------------------
 
@@ -72,6 +85,6 @@ VALUES
 
 INSERT INTO _note_privileges(note_id, user_name, read, write)
 VALUES
-(8, 'floyd', 't', 't'),
-(3, 'bobtereme', 't', 't');
+(8, 'floyd', true, true),
+(3, 'bobtereme', true, true);
 

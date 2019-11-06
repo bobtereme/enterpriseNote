@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"html/template"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,6 +13,11 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
+
+type BasicTemplate struct {
+	Title string
+	News  string
+}
 
 func connectDatabase() (db *sql.DB) {
 	//Open db connection
@@ -30,43 +35,157 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// mock data - @todo implement db
-
-	router.HandleFunc("/login", login).Methods("GET")
-	router.HandleFunc("/login/listUsers", listUsers).Methods("GET")
-	router.HandleFunc("/notes", listNotes).Methods("GET")
+	router.HandleFunc("/", index).Methods("GET")
+	router.HandleFunc("/login", login)
+	router.HandleFunc("/home/{UserName}", home).Methods("GET")
+	router.HandleFunc("/listUsers", listUsers).Methods("GET")
+	router.HandleFunc("/listNotes", listNotes).Methods("GET")
 	router.HandleFunc("/notes/search", getNote).Methods("GET")
 	router.HandleFunc("/notes/create", createNote).Methods("POST")
 	router.HandleFunc("/notes/update/{id}", updateNote).Methods("PUT")
 	router.HandleFunc("/notes/delete/{id}", deleteNote).Methods("DELETE")
+	router.HandleFunc("/signUp", signUp).Methods("GET")
+	router.HandleFunc("/createUser", createUser).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-// LOGIN
+func index(w http.ResponseWriter, r *http.Request) {
+	p := BasicTemplate{Title: "Index", News: "Stuff"}
+	t, _ := template.ParseFiles("index.html")
+	t.Execute(w, p)
+
+}
+func home(w http.ResponseWriter, r *http.Request) {
+
+	p := BasicTemplate{Title: "Home", News: "Stuff"}
+	t, _ := template.ParseFiles("homepageTemplate.html")
+	t.Execute(w, p)
+
+}
+func signUp(w http.ResponseWriter, r *http.Request) {
+	p := BasicTemplate{Title: "Sign UP", News: "enter details:"}
+	t, _ := template.ParseFiles("basictemplate.html")
+	t.Execute(w, p)
+}
+func checkLoggedIn(r *http.Request) *http.Cookie {
+	cookie, err := r.Cookie("logged-in")
+	if err == http.ErrNoCookie {
+		return nil
+	}
+	return cookie
+}
 func login(w http.ResponseWriter, r *http.Request) {
+
+	cookie := checkLoggedIn(r)
+
+	if cookie != nil {
+		http.Redirect(w, r, "/index"+cookie.Value, http.StatusSeeOther)
+	}
+
+	if r.Method == http.MethodPost {
+
+		var userLogin User
+		//req, _ := ioutil.ReadAll(r.Body)
+		//json.Unmarshal(req, &userLogin)
+		userLogin.UserName = r.FormValue("username")
+		userLogin.Password = r.FormValue("password")
+		if checkUsername(userLogin.UserName) {
+
+			cookie, err := r.Cookie("logged-in")
+			if err == http.ErrNoCookie {
+				cookie = &http.Cookie{ // create a username cookie
+					Name:  "username", // cookie name
+					Value: userLogin.UserName,
+					Path:  "/", // stored username
+				}
+			}
+			http.SetCookie(w, cookie) // set user name cookie
+			//fmt.Fprint(w, "Login Successfull, logged in as "+userLogin.UserName) // print for correct login details
+			http.Redirect(w, r, "/home/"+cookie.Value, http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+			//fmt.Fprint(w, "Login Unsuccessfull, bad username") // print for incorrect login details
+		}
+
+	}
+	p := BasicTemplate{Title: "Login", News: "enter details:"}
+	t, _ := template.ParseFiles("logintemplate.html")
+	t.Execute(w, p)
+
+}
+
+func getUsersNotes(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	cookie := checkLoggedIn(r)
+	if cookie == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	if cookie.Value == params["UserName"] {
+		t, err := template.ParseFiles("homepageTemplate.html")
+		if err != nil {
+			log.Fatal(err)
+		}
+		userNotes := getUsersNotesSql(params["UserName"])
+		err = t.Execute(w, userNotes)
+		if err != nil {
+			log.Fatal(err)
+
+		}
+	} else {
+		http.Redirect(w, r, "/LogIn", http.StatusSeeOther)
+	}
+}
+func getUsersNotesSql(paramater string) []Note {
+	db := connectDatabase()
+
+	rows, err := db.Query(`SELECT DISTINCT _note.note_id,_note.note_owner,_note.title,_note.body,_note.date_created FROM note LEFT JOIN _note_privileges ON _note.note_id = _note_privileges.note_id WHERE _note.note_owner = ` + paramater + ` OR (_note_privileges._user_name = ` + paramater + ` AND _note_privileges.read = true)`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var userNotes []Note
+	var note Note
+	for rows.Next() {
+		err = rows.Scan(&note.ID, &note.NoteOwner, &note.Title)
+		if err != nil {
+			log.Fatal(err)
+		}
+		userNotes = append(userNotes, note)
+	}
+
+	return userNotes
+}
+func createUser(w http.ResponseWriter, r *http.Request) {
+	var newUser User
+	newUser.UserName = r.FormValue("user_name")
+	newUser.GivenName = r.FormValue("given_name")
+	newUser.FamilyName = r.FormValue("family_name")
+	newUser.Password = r.FormValue("password")
 
 	db := connectDatabase()
 	defer db.Close()
 
-	var userLogin User
-	req, _ := ioutil.ReadAll(r.Body)
-	json.Unmarshal(req, &userLogin)
-
-	if checkUsername(userLogin.UserName) {
-
-		usernameCookie := &http.Cookie{ // create a username cookie
-			Name:  "username",         // cookie name
-			Value: userLogin.UserName, // stored username
+	if !checkUsername(newUser.UserName) {
+		stmt, err := db.Prepare("INSERT INTO _user(user_name, given_name, family_name, password) VALUES($1,$2,$3,$4);")
+		if err != nil {
+			log.Fatal(err)
 		}
-
-		http.SetCookie(w, usernameCookie)                                    // set user name cookie
-		fmt.Fprint(w, "Login Successfull, logged in as "+userLogin.UserName) // print for correct login details
-
+		_, err = stmt.Exec(newUser.UserName, newUser.GivenName, newUser.FamilyName, newUser.Password)
+		if err != nil {
+			log.Fatal(err)
+		}
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
-		fmt.Fprint(w, "Login Unsuccessfull, bad username") // print for incorrect login details
+		fmt.Fprint(w, "Username already exists")
 	}
-
 }
+
+// LOGIN
 
 func listUsers(w http.ResponseWriter, r *http.Request) {
 
@@ -150,44 +269,59 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/* func searchNote(w http.ResponseWriter, r *http.Request) {
+	p := BasicTemplate{Title: "Search for a note", News: "Stuff"}
+	t, _ := template.ParseFiles("searchNoteTemplate.html")
+	t.Execute(w, p)
+} */
+
 func getNote(w http.ResponseWriter, r *http.Request) {
 
-	db := connectDatabase()
-	defer db.Close()
-
 	var note Note
-	req, _ := ioutil.ReadAll(r.Body)
-	json.Unmarshal(req, &note)
+	fmt.Println(notes)
+	note.Title = r.FormValue("inputPattern")
 
-	if checkNote(note.Title) {
+	//req, _ := ioutil.ReadAll(r.Body)
+	//json.Unmarshal(req, &note)
+	for i := range notes {
+		if checkNote(notes[i].Title) {
 
-		noteCookie := &http.Cookie{ // create a username cookie
-			Name:  "title",    // cookie name
-			Value: note.Title, // stored username
+			noteCookie := &http.Cookie{ // create a username cookie
+				Name:  "title",    // cookie name
+				Value: note.Title, // stored username
+			}
+
+			http.SetCookie(w, noteCookie) // set user name cookie
+
+			//(notes[i].Title)
+			//fmt.Fprint(w, "note found with title "+note.Title) // print for correct login details
+
+		} else {
+			//fmt.Fprint(w, "Note not found, bad title") // print for incorrect login details
 		}
-
-		http.SetCookie(w, noteCookie)                      // set user name cookie
-		fmt.Fprint(w, "note found with title "+note.Title) // print for correct login details
-
-	} else {
-		fmt.Fprint(w, "Note not found, bad title") // print for incorrect login details
 	}
+
+	p := BasicTemplate{Title: "Search for a note", News: "Stuff"}
+	t, _ := template.ParseFiles("searchNoteTemplate.html")
+	t.Execute(w, p)
 
 }
 
-func checkNote(noteTitle string) bool {
+func checkNote(textPattern string) bool {
 
 	db := connectDatabase() // db connection
 	defer db.Close()        // close db connection after use
 
-	getNoteTitle, err := db.Prepare("Select * FROM _note WHERE title = $1;") // sql query sent to db $1 is the user name
+	getnote, err := db.Prepare("Select * FROM _note WHERE body LIKE '%$1%';") // sql query sent to db $1 is the user name
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	note := Note{}
-	err = getNoteTitle.QueryRow(noteTitle).Scan(&note.ID, &note.Title, &note.NoteOwner, &note.Body, &note.DateCreated) // sending query
-
+	var notes []Note
+	notes = append(notes, note)
+	err = getnote.QueryRow(textPattern).Scan(&note.ID, &note.Title, &note.NoteOwner, &note.Body, &note.DateCreated) // sending query
+	fmt.Println(note)
 	switch {
 	case err == sql.ErrNoRows:
 
@@ -278,6 +412,11 @@ type Note struct {
 	Title       string `json:"title"`
 	Body        string `json:"body"`
 	DateCreated string `json:"date_created"`
+}
+
+type array struct {
+	notes []Note
+	users []User
 }
 
 // init notes var as slice note struct
