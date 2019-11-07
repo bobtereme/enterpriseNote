@@ -1,5 +1,5 @@
 # enterpriseNote
-#Quick guide
+# Quick guide
 **1.** Install PostgreSQL if you don't already have it
 
 **2.** Open PostgreSQL and create a new database called “NoteDB”
