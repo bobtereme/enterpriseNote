@@ -1,0 +1,34 @@
+<style>
+    table {
+
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: lightblue;
+    }
+</style>
+
+
+
+<body>
+    <h1>Share Note </h1>
+    <form method="POST">
+        <label>Username:</label><br />
+        <input type="text" name="username"><br />
+        <label>Read Access:</label><br />
+        <input type="checkbox" name="readAccess"><br />
+        <label>Write Access:</label><br />
+        <input type="checkbox" name="writeAccess"><br />
+        <input type="submit" value="Share Note">
+    </form>
+</body>
+

@@ -1,0 +1,59 @@
+<style>
+    table {
+
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 2px solid black;
+        text-align: left;
+        padding: 8px;
+    }
+
+    td {
+        background-color: lightgrey;
+    }
+</style>
+
+
+
+<body>
+    <h1>All Notes</h1>
+    <table name="note_table">
+        <thead>
+            <th>NoteID</th>
+            <th>Owner</th>
+            <th>Title</th>
+            <th>Contents</th>
+            <th>Date Created</th>
+            <th>Update</th>
+            <th>Analyse</th>
+            <th>Share</th>
+            <th>Edit User Access</th>
+            <th>Delete</th>
+        </thead>
+        <tbody>
+            {{range $value := .}}
+            <tr>
+                <td>{{$value.ID}}</td>
+                <td>{{$value.NoteOwner}}</td>
+                <td>{{$value.Title}}</td>
+                <td>{{$value.Body}}</td>
+                <td>{{$value.DateCreated}}</td>
+                <td><button type="button" onclick="location.href = '/notes/update/{{$value.ID}}';">Update</button></td>
+                <td><button type="button" onclick="location.href = '/notes/analyse/{{$value.ID}}';">Analyse</button>
+                </td>
+                <td><button type="button" onclick="location.href = '/notes/share/{{$value.ID}}';">Share</button></td>
+                <td><button type="button" onclick="location.href = '/notes/viewPrivileges/{{$value.ID}}';">Edit
+                        Access</button></td>
+                <td><button type="button" onclick="location.href = '/notes/delete/{{$value.ID}}';">Delete</button></td>
+            </tr>
+
+            {{end}}
+        </tbody>
+
+    </table>
+
+</body>

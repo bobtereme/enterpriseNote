@@ -27,7 +27,7 @@ CREATE TABLE _note(
 DROP TABLE IF EXISTS _note_privileges;
 CREATE TABLE _note_privileges(
     note_privileges_id serial NOT NULL PRIMARY KEY,
-    note_id INT,
+    note_id int,
     user_name VARCHAR(50),
     read BOOL,
     write BOOL,
@@ -39,7 +39,7 @@ DROP TABLE IF EXISTS _share_settings;
 CREATE TABLE _share_settings  (
 	SharedSettingsID SERIAL PRIMARY KEY,
 	OwnerName VARCHAR(50), 
-	SharedUserID INT,
+	SharedUserID VARCHAR(50),
 	Read bool,
 	Write bool,
 	Name VARCHAR(30),
@@ -85,6 +85,20 @@ VALUES
 
 INSERT INTO _note_privileges(note_id, user_name, read, write)
 VALUES
+(1, 'floyd', true, true),
+(2, 'floyd', true, true),
+(3, 'floyd', true, true),
+(4, 'floyd', true, true),
+(5, 'floyd', true, false),
+(6, 'floyd', true, false),
+(7, 'floyd', true, true),
 (8, 'floyd', true, true),
-(3, 'bobtereme', true, true);
+(5, 'bobtereme', true, true),
+(6, 'bobtereme', true, true),
+(7, 'bobtereme', true, true),
+(8, 'bobtereme', true, true),
+(1, 'bobtereme', true, false),
+(2, 'bobtereme', true, false),
+(3, 'bobtereme', true, true),
+(4, 'bobtereme', true, true);
 

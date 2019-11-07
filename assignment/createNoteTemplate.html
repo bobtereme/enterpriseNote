@@ -1,10 +1,46 @@
-<h1>New Note</h1>
+
+    <style>
+       
+    
+        table {
+    
+            border-collapse: collapse;
+            width: 100%;
+        }
+    
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    
+        tr:nth-child(even) {
+            background-color: lightblue;
+        }
+    
+         
+    
+        
+    </style>
+
+
+
+
+<body>
+<h1>Create Note</h1>
 <form action="/notes/create" method="POST">
-<label>Title: <br>
-<input type="text" name="title" placeholder="Title"></label>
-<br>
-<label>Body: <br>
-<textarea name="body" placeholder="Body"></textarea></label>
-<br>
-<input type="submmit">
+    <label>Title:</label><br />
+    <input type="text" name="title"><br />
+    <label>Body:</label><br />
+    <textarea name="body" rows="10" cols="50"></textarea><br />
+    <select name="settingSelect">
+        <option name="None">None</option>
+        {{range $value := .}}
+        <option name="{{$value.Name}}">{{$value.Name}}</option>
+        {{end}}
+    </select><br>
+    <input type="submit" value="Create Note">
 </form>
+</body>
+</html>

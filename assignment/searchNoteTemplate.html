@@ -1,8 +1,45 @@
-<h1>{{.Title}}</h1>
-<p>{{.News}}</p>
-<form method="GET">
+<style>
+   table {
+    
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td,
+  th {
+    border: 2px solid black;
+    text-align: left;
+    padding: 8px;
+  }
+
+  td {
+    background-color: lightgrey;
+  }
+  </style>
+<h1>Search Notes</h1>
+<form method="POST">
     <label for="textPattern">Search Text Pattern</label>
-    <input type="text" id="inputpattern">
+    <input type="text" name="search" id="inputpattern">
     <input type="submit">
     <label for="found" name="found">Found</label>
 </form>
+<table name="note_table">
+    <thead>
+        <th>Note id</th>
+        <th>Title</th>
+        <th>Contents</th>
+        <th>Date Created</th>
+    </thead>
+    <tbody>
+        
+        {{range $value := .}}
+        <tr>
+            <td>{{$value.ID}}</td>
+            <td>{{$value.Title}}</td>
+            <td>{{$value.Body}}</td>
+            <td>{{$value.DateCreated}}</td>
+        </tr>
+
+        {{end}}
+    </tbody>
+</table>

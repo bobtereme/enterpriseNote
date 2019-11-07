@@ -1,0 +1,30 @@
+<style>
+    table {
+
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: lightblue;
+    }
+</style>
+
+
+<body>
+    <h1>Update a Note</h1>
+    <form method="POST">
+        <label>Title:</label><br />
+        <input type="text" name="title" value="{{.Title}}"><br />
+        <label>Body:</label><br />
+        <textarea name="body" rows="10" cols="50">{{.Body}}</textarea><br />
+        <input type="submit" value="Update Note">
+    </form>
+</body>

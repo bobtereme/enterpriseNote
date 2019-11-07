@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport">
+    <title>Analyse</title>
+    <style>
+        * {
+          font-family: arial, sans-serif;
+        }
+    
+        table {
+    
+          border-collapse: collapse;
+          width: 100%;
+        }
+    
+        td,
+        th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+    
+        tr:nth-child(even) {
+          background-color: lightblue;
+        }
+    
+        .topnav {
+          background-color: #333;
+          overflow: hidden;
+        }
+    
+        .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+          font-size: 17px;
+        }
+    
+        .topnav a:hover {
+    
+          color: lightblue;
+        }
+    
+        .topnav a.active {
+          background-color: lightblue;
+          color: black;
+        }
+      </style>
+  
+  </head>
+  
+ 
+  
+
+<body>
+    <h2>Analyse Note</h2> <hr>
+    <h3>Analyse how many time the given text pattern is within a note</h3>
+    <h3>Analysing NoteID: {{.ID}}</h3>
+
+    <form action="/notes/analyse/{{.ID}}" method="POST">
+        <label>Search for occurences of:</label><br />
+        <input type="text" name="search"><br />
+        <input type="submit" value="Search" >
+    </form>
+
+    <br>
+
+    <h3>Matching text pattern count: {{.Count}}</h3>
+
+
+        
+
+</body>
+
+
+
+</html>

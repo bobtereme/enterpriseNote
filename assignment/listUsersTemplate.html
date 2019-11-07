@@ -1,0 +1,48 @@
+<style>
+    table {
+
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 2px solid black;
+        text-align: left;
+        padding: 8px;
+    }
+
+    td {
+        background-color: lightgrey;
+    }
+</style>
+
+
+
+
+
+<body>
+    <h1>All Users</h1>
+
+
+    <table name="user_table">
+        <thead>
+            <th>User name</th>
+            <th>Given name</th>
+            <th>Family name</th>
+
+        </thead>
+        <tbody>
+            {{range $value := .}}
+            <tr>
+                <td>{{$value.UserName}}</td>
+                <td>{{$value.GivenName}}</td>
+                <td>{{$value.FamilyName}}</td>
+            </tr>
+
+            {{end}}
+        </tbody>
+
+    </table>
+
+</body>
