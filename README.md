@@ -14,6 +14,6 @@
 
 **7.** Log in with the given id
 
-**8** After loging in you will taken to your home page where you can view, analyse, update, share, view privileges, or delete all your notes, You can chose to create a new note, List all users, list all the notes, and search for a note
+**8.** After loging in you will taken to your home page where you can view, analyse, update, share, view privileges, or delete all your notes, You can chose to create a new note, List all users, list all the notes, and search for a note
 
-**9** You can log out from your homepage and login as a new user
+**9.** You can log out from your homepage and login as a new user
