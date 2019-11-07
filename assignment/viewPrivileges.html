@@ -1,0 +1,73 @@
+
+    
+    <style>
+     
+  
+      table {
+  
+        border-collapse: collapse;
+        width: 100%;
+      }
+  
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+  
+      tr:nth-child(even) {
+        background-color: lightblue;
+      }
+  
+      
+  
+      
+    </style>
+
+
+
+<script>
+  var noteid = 0;
+  
+  function setNoteID(id){
+    noteid = id;
+  }
+  
+  function getNoteID(){
+    return noteid;
+  }
+</script>
+
+<body>
+<h1>User Access List</h1>
+
+<table name="note_table">
+    <thead>
+        <th>NoteID</th>
+        <th>User Name</th>
+        <th>Read</th>
+        <th>Write</th>
+        <th>Edit</th>
+        
+    </thead>
+    {{range $value := .}}
+
+    <tbody>
+    <style onload="setNoteID('{{$value.ID}}')"></style>
+    <tr>
+      <td>{{$value.ID}}</td>
+      <td>{{$value.UserName}}</td>
+      <td>{{$value.Read}}</td>
+      <td>{{$value.Write}}</td>
+      <td><button type="button" onclick="location.href = '/notes/editPrivileges/{{$value.ID}}';">Edit</button></td>
+    </tr>    
+    {{end}}
+  </tbody>
+    
+</table>
+<button type="button" onclick="location.href = '/notes/createSharedSetting/' + getNoteID();">Save New Shared Settings</button>
+
+</body>
+
+</html>
